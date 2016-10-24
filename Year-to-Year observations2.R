@@ -66,8 +66,6 @@ pH_summary<-dta%>%
   filter(Analyte=="pH") %>%
   dplyr::group_by(Station_ID, Analyte, year)
   
-pH_summary<-Summary_by_year %>%
-  group_by(Analyte == 'pH') 
 pH_summary<-dcast(pH_summary, Station_ID ~ year)
 pH_summary[pH_summary == 0] <- NA
 
@@ -125,7 +123,7 @@ Ecoli_summary$row_sum<-rowSums(Ecoli_summary[,c(19:25)])
 Ecoli_trend<-Ecoli_summary%>%
   filter(row_sum>0)
 
-#Enterococcus
+#Enterococcus 
 Entero_summary<-dta%>%
   filter(Analyte=="Enterococcus") %>%
   dplyr::group_by(Station_ID, Analyte, year)
@@ -140,7 +138,45 @@ Entero_summary$trend_2004_2014<-ifelse(rowSums(is.na(Entero_summary[,c(6:16)]))>
 Entero_summary$trend_2005_2015<-ifelse(rowSums(is.na(Entero_summary[,c(7:17)]))>0, 0, 1)
 Entero_summary$trend_2006_2016<-ifelse(rowSums(is.na(Entero_summary[,c(8:18)]))>0, 0, 1)
 
-Entero_summary$row_sum<-rowSums(Entero_summary[,c(19:25)])
+Entero_summary$row_sum<-rowSums(Entero_summary[,c(19:24)])
 
 Entero_trend<-Entero_summary%>%
   filter(row_sum>0)
+
+####Status####
+
+#pH
+pH_status<-pH_summary[,c(1, 16:18)] #2014-2016
+pH_status[pH_status == 0] <- NA
+
+pH_status$status<-ifelse(rowSums(is.na(pH_status)[,c(2:4)])>0, 0, 1)
+
+pH_status<-pH_status%>%
+  filter(status_2014_2016 > 0)
+
+#Temperature
+temp_status<-temp_summary[,c(1,16:18)]
+temp_status[temp_status == 0] <- NA
+
+temp_status$status<-ifelse(rowSums(is.na(temp_status)[,c(2:4)])>0, 0, 1)
+
+temp_status<-temp_status %>%
+  filter(status > 0)
+
+#E. coli
+Ecoli_status<-Ecoli_summary[,c(1,16:18)]
+Ecoli_status[Ecoli_status == 0] <- NA
+
+Ecoli_status$status<-ifelse(rowSums(is.na(Ecoli_status)[,c(2:4)])>0, 0, 1)
+
+Ecoli_status<-Ecoli_status %>%
+  filter(status > 0)
+
+#Enterococcus
+Entero_status<-Entero_summary[,c(1,15:17)]
+Entero_status[Entero_status == 0] <- NA
+
+Entero_status$status<-ifelse(rowSums(is.na(Entero_status)[,c(2:4)])>0, 0, 1)
+
+Entero_status<-Entero_status %>%
+  filter(status > 0)
